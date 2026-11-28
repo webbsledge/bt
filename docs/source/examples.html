@@ -247,7 +247,7 @@ Win 12m %            67.14%
 <span class="n">res2</span> <span class="o">=</span> <span class="n">bt</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">sma10</span><span class="p">,</span> <span class="n">sma20</span><span class="p">,</span> <span class="n">sma40</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">'m'</span><span class="p">);</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">offsets</span><span class="o">.</span><span class="n">MonthEnd</span><span class="p">(),</span> <span class="n">title</span><span class="o">=</span><span class="s2">"monthly Equity Progression"</span><span class="p">);</span>
 </pre></div>
 </div>
 <a class="pynb reference internal image-reference" href="../../_images/examples-nb_18_0.png"><img alt="../../_images/examples-nb_18_0.png" class="pynb" src="../../_images/examples-nb_18_0.png" style="width: 879px; height: 320px;" />
