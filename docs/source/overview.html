@@ -144,8 +144,11 @@ allows the backtest to be run using unadjusted price data and to get
 historically correct transactions (position sizes and commissions).</p>
 <p>Security positions are adjusted on dates where a split value other than
 1.0 is given. A value above 1.0 causes the position size to increase
-(compared to the previous date) and vice versa. Split-adjusted values and
-weights are available to subsequent Algos in the same iteration.</p>
+(compared to the previous date) and vice versa. In a Strategy’s stack, the
+split is applied when the strategy moves to the date, before it values its
+positions at that date’s prices, so the date’s values, weights and
+bankruptcy check all use the split-adjusted positions. Calling the Algo
+applies a split that has not been applied yet for that date.</p>
 <p>On a given date, a position on a security causes a cash inflow (when
 long) or outflow (when short) given by the size of the position times
 the amount in the <cite>dividends</cite> dataframe. Cash adjustments are made on
@@ -154,10 +157,11 @@ easily obtainable.</p>
 <p>Applicable split ratios and dividends must be finite. Nonfinite values
 raise ValueError before either action changes portfolio state. Missing
 values retain the no-action meanings described below.</p>
-<p>This Algo must run at every iteration to be able to change security
-positions as required by splits. All dates in the <cite>dividends`and
-`splits</cite> dataframes must exist in the price data for the calculations
-to work correctly.</p>
+<p>In a Strategy’s stack, including nested AlgoStacks, splits are applied
+even when earlier Algos skip the date. This Algo must still run on
+dividend dates to credit the cash. When wrapped in other Algos, splits
+retain their call-time behavior. All dates in the <cite>dividends</cite> and
+<cite>splits</cite> dataframes must exist in the price data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
