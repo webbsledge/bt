@@ -313,6 +313,36 @@ def test_bankruptcy_at_zero_price_flattens_before_the_algos_run(integer_position
     assert (s.values.iloc[3:] == -2_000_000.0).all()
 
 
+@pytest.mark.parametrize("nested_stack", [False, True])
+@pytest.mark.parametrize("nested_strategy", [False, True])
+@pytest.mark.parametrize("run_algo", [bt.algos.RunOnce, bt.algos.RunWeekly])
+def test_split_is_applied_on_dates_the_stack_skips(nested_stack, nested_strategy, run_algo):
+    raw, adjusted, splits, weights = _split_frames("levered_long_split")
+
+    def run(prices, corporate_actions):
+        algos = [bt.algos.WeighSpecified(**weights), bt.algos.Rebalance()]
+        if corporate_actions:
+            algos.insert(0, bt.algos.CorporateActions(pd.DataFrame(), splits))
+        if nested_stack:
+            algos = [bt.AlgoStack(*algos)]
+        strategy = bt.Strategy("child", [run_algo(), *algos], children=list(weights))
+        if nested_strategy:
+            strategy = bt.Strategy("parent", [bt.algos.WeighSpecified(child=1.0), bt.algos.Rebalance()], [strategy])
+        backtest = bt.Backtest(strategy, prices, integer_positions=False, progress_bar=False)
+        backtest.run()
+        return backtest.strategy
+
+    actual = run(raw, corporate_actions=True)
+    expected = run(adjusted, corporate_actions=False)
+
+    assert not actual.bankrupt
+    pd.testing.assert_series_equal(actual.values, expected.values)
+    if nested_strategy:
+        actual, expected = actual["child"], expected["child"]
+        pd.testing.assert_series_equal(actual.prices, expected.prices)
+    assert actual["a"].position == pytest.approx(expected["a"].position)
+
+
 def test_corporate_actions_applies_each_split_once():
     dates = pd.date_range("2024-06-03", periods=4)
     prices = pd.DataFrame({"a": [10.0, 10.0, 5.0, 5.0]}, index=dates)

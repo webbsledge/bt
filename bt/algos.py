@@ -1875,10 +1875,11 @@ class CorporateActions(Algo):
     raise ValueError before either action changes portfolio state. Missing
     values retain the no-action meanings described below.
 
-    This Algo must run at every iteration to be able to change security
-    positions as required by splits. All dates in the `dividends`and
-    `splits` dataframes must exist in the price data for the calculations
-    to work correctly.
+    In a Strategy's stack, including nested AlgoStacks, splits are applied
+    even when earlier Algos skip the date. This Algo must still run on
+    dividend dates to credit the cash. When wrapped in other Algos, splits
+    retain their call-time behavior. All dates in the `dividends` and
+    `splits` dataframes must exist in the price data.
 
     Args:
         * dividends (dataframe): dataframe of dividend amounts per unit of
